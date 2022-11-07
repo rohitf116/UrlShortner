@@ -9,22 +9,22 @@ const isURL = require('is-url');
 
 const { promisify } = require('util');
 
-const isValid = value => {
+const isValid = (value) => {
   if (typeof value === 'undefined' || value === null) return false;
   if (typeof value === 'string' && value.trim().length === 0) return false;
   return true;
 };
 
 const redisClient = redis.createClient(
-  13180,
-  'redis-13180.c212.ap-south-1-1.ec2.cloud.redislabs.com',
+  11260,
+  'redis-11260.c301.ap-south-1-1.ec2.cloud.redislabs.com',
   { no_ready_check: true }
 );
-redisClient.auth('X2LopUpqaXLNvOgWuKx3hCSjXEJh1wmz', function(err) {
+redisClient.auth('hWJicVYY5mMIRSzlK6qpuNn67JT8KLlD', function (err) {
   if (err) throw err;
 });
 
-redisClient.on('connect', async function() {
+redisClient.on('connect', async function () {
   console.log('Connected to Redis..');
 });
 
@@ -33,7 +33,7 @@ const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 
 //===================================Create Short URL===========================================
 
-exports.shortUrl = async function(req, res) {
+exports.shortUrl = async function (req, res) {
   try {
     const { longUrl } = req.body;
     if (Object.keys(req.body).length === 0) {
@@ -57,7 +57,7 @@ exports.shortUrl = async function(req, res) {
       return res.status(200).send({
         status: true,
         message: 'This url is already exist',
-        data: finalResult
+        data: finalResult,
       });
     }
     const foundUrl = await urlModel.findOne({ longUrl });
@@ -65,13 +65,13 @@ exports.shortUrl = async function(req, res) {
       const data = {
         urlCode: foundUrl.urlCode,
         longUrl: foundUrl.longUrl,
-        shortUrl: foundUrl.shortUrl
+        shortUrl: foundUrl.shortUrl,
       };
       await SETEX_ASYNC(`${longUrl}`, 600, JSON.stringify(data));
       return res.status(200).send({
         status: true,
         message: 'This url is already exist',
-        data: data
+        data: data,
       });
     }
 
@@ -81,7 +81,7 @@ exports.shortUrl = async function(req, res) {
     const data = {
       urlCode: result.urlCode,
       longUrl: result.longUrl,
-      shortUrl: result.shortUrl
+      shortUrl: result.shortUrl,
     };
 
     res
@@ -94,7 +94,7 @@ exports.shortUrl = async function(req, res) {
 
 //===================================redirect Short URL on Long URL===========================================
 
-exports.urlCode = async function(req, res) {
+exports.urlCode = async function (req, res) {
   try {
     const { urlCode } = req.params;
     const regex = /^[A-Za-z0-9_-]{7,14}$/;
